@@ -1,0 +1,234 @@
+{# Diese Datei ist Teil der Datenblattsammlung von mksec.
+ #
+ # Diese Datei darf unter gleichen Bedingungen und Nennung des Autors weiter-
+ # gegeben und veraendert werden. Weitere Informationen finden Sie in der
+ # LICENSE Datei.
+ #
+ # Copyright (c) 2016 mksec, Inh. Alexander Haase
+ #}
+
+{% extends "main.tex.twig" %}
+
+{% block title %}DS-TAL{% endblock %}
+
+
+{% from "macros/checkbox.tex.twig" import checkbox as checkbox %}
+
+{% block content %}
+
+% Haupt-Informationen zur TAL.
+%
+% Eine TAL wird durch die Anschlussrufnummer identifiziert. Um das Datenblatt
+% moeglichst zusammen haengend zu gestallten, werden auch alle weiteren Ruf-
+% nummern hier mit angegeben. Im Datenbestand ist die Anschlussnummer als erste
+% im Array tal.rufnummern zu finden.
+\begin{tabularx}{\textwidth}{|X|X|XX|}
+	\cline{1-4}
+
+	{\tiny Vorwahl} & {\tiny Hauptrufnummer} & & \\
+	{{ tal.vorwahl }} & {{ tal.rufnummern|first }} & & \\
+	\cline{1-4}
+
+	\multicolumn{4}{|l|}{\tiny weitere Rufnummern} \\
+	\multicolumn{4}{|@{}c@{}|}{
+		{\begin{tabularx}{\textwidth}{XXXXX}
+			{% if tal.rufnummern %}
+				{% for row in tal.rufnummern|slice(1, length)|batch(5, '') %}
+					{% for num in row %}
+						{{ num }}
+						{% if not loop.last %}&{% else %}\\{% endif %}
+					{% endfor %}
+				{% endfor %}
+			{% else %}
+				\\
+				\\
+			{% endif %}
+		\end{tabularx}}
+	} \\
+
+	\cline{1-4}
+\end{tabularx}
+
+
+\vspace{5mm}
+
+
+% Informationen zum Anschluss der TAL. Idealer weise sollte die APL-Port-Nummer
+% bekannt sein, falls der Provider eine Anschlusskennung nicht zuordnen kann,
+% oder noch keine bekannt ist (z.B. Erstaufschaltung). Optional sollte auch der
+% Ort des Anschlusses angegeben werden. Meist ist die TAL entweder an einer TAE
+% Dose angeschlossen, oder in Rechenzentren auch an Patch-Paneln.
+\begin{tabularx}{\textwidth}{|XXX|}
+	\hline
+
+	{\tiny Anschl"usse} & & \\
+
+	{{ checkbox(tal.apl) }} APL
+	\underline{ {{ tal.apl.panel|default('\\hspace{1cm}') }} }
+	Port \underline{ {{ tal.apl.port|default('\\hspace{1cm}') }} } &
+
+	{{ checkbox(tal.tae) }} TAE
+	\underline{ {{ tal.tae|default('\\hspace{1cm}') }} }
+	&
+
+	{{ checkbox(tal.patchpanel) }} Patchpanel
+	\underline{ {{ tal.patchpanel.panel|default('\\hspace{8mm}') }} },
+	Port
+	\underline{ {{ tal.patchpanel.port|default('\\hspace{8mm}') }} }
+	\\
+
+	\hline
+\end{tabularx}
+
+
+\vspace{10mm}
+
+
+% Angaben zum Provider.
+%
+% Sofern die TAL derzeit aktiv ist, werden Informationen zum derzeitigen
+% Provider angegeben. Ziel ist es, die wichtigesten Daten fuer Anrufe z.B. in
+% einem Stoerungsfall griffbereit zu haben. Somit ist also auch z.B. die Hotline
+% angegeben.
+\begin{tabularx}{\textwidth}{|X|X|X|X|}
+	\hline
+
+	{\tiny Provider} & {\tiny Kundennummer} & {\tiny Hotline} &
+		{\tiny Hotline-Passwort} \\
+	{{ provider.name }} & {{ provider.kundennummer }} &
+		{{ provider.hotline.tel }} & {{ provider.hotline.passwort|default('-')}}
+		\\
+	\hline
+
+	{\tiny Vertragsbegin} & {\tiny Vertragsende} & \multicolumn{2}{l|}{} \\
+	{{ provider.vertrag.begin }} & {{ provider.vertrag.ende }} &
+		\multicolumn{2}{l|}{} \\
+
+	\hline
+\end{tabularx}
+
+
+\vspace{5mm}
+
+
+% Angaben zur Internetverbindung.
+%
+% Im folgenden Abschnitt folgen Angaben zur verwendeten Technik fuer die
+% Internet-Anbindung, Zugangsdaten und vereinbarte Leistungen.
+\begin{tabularx}{\textwidth}{|X|X|X|X|}
+	\multicolumn{4}{|@{}c@{}}{
+		{\begin{tabularx}{\textwidth}{l|X}
+			\cline{1-1}
+			\small Internet & \\
+		\end{tabularx}}
+	} \\
+
+	\cline{1-4}
+
+	\multicolumn{4}{|@{}c@{}|}{
+		{\begin{tabularx}{\textwidth}{XXX}
+			{\tiny Technik} & & \\
+
+			{{ checkbox(internet.technik.annex, 'B') }} Annex B &
+			{{ checkbox(internet.technik.annex, 'J') }} Annex J &
+			{{ checkbox(internet.technik.splitter) }} Splitter ben"otigt
+		\end{tabularx}}
+	} \\
+	\cline{1-4}
+
+	{\tiny Benutzername} & {\tiny Kennwort} & {\tiny Anschlusskennung} &
+		{\tiny Mitbenutzernummer} \\
+	{{ internet.zugangsdaten.benutzer }} &
+		{{ internet.zugangsdaten.passwort }} &
+		{{ internet.zugangsdaten.anschlusskennung }} &
+		{{ internet.zugangsdaten.mitbenutzernummer }} \\
+	\cline{1-4}
+
+	{\tiny Downstream in kbit/s} & {\tiny Upstream in kbit/s} &
+		\multicolumn{2}{c|}{} \\
+	{{ internet.stream.down }} & {{ internet.stream.up }} &
+		\multicolumn{2}{c|}{} \\
+	\cline{1-4}
+
+	\multicolumn{4}{|@{}c@{}|}{
+		{\begin{tabularx}{\textwidth}{XXX}
+			{\tiny Anschlussmerkmale} & & \\
+
+			{{ checkbox(internet.merkmale.ip4) }} IPv4 mit
+			\underline{ {{ internet.merkmale.ip4|default('\\hspace{1cm}') }} }
+			IPs &
+
+			{{ checkbox(internet.merkmale.ip6) }} IPv6 mit /
+			\underline{ {{ internet.merkmale.ip6|default('\\hspace{1cm}') }} }
+			Prefix &
+
+			{{ checkbox(internet.merkmale.zwangstrennung) }} Zwangstrennung alle
+			\underline{
+				{{ internet.merkmale.zwangstrennung|default('\\hspace{5mm}') }}
+			} Std. \\
+
+			{{ checkbox(internet.merkmale.statisch) }} statische IP &
+
+			{{ checkbox(internet.merkmale.tr069) }} TR069 Provisioning \\
+
+			% Da im Falle von festen IPs diese stark von Anzahl und IP-Version
+			% abhaengen, sind fuer diese hier keine eigenen Felder vorgesehen,
+			% sondern sie werden unten im Bemerkungs-Bereich mit gelistet.
+		\end{tabularx}}
+	} \\
+	\cline{1-4}
+\end{tabularx}
+
+
+\vspace{5mm}
+
+
+% Angaben zur Telefonie.
+%
+% Im folgenden Abschnitt folgen Angaben zur verwendeten Technik fuer die
+% Telefon-Anbindung, Zugangsdaten und vereinbarte Leistungen.
+\begin{tabularx}{\textwidth}{|X|X|X|X|}
+	\multicolumn{4}{|@{}c@{}}{
+		{\begin{tabularx}{\textwidth}{l|X}
+			\cline{1-1}
+			\small Telefon & \\
+		\end{tabularx}}
+	} \\
+
+	\cline{1-4}
+
+	\multicolumn{2}{|l@{}|}{
+		{\tiny Technik}
+	} &  {\tiny Benutzername} & {\tiny Passwort} \\
+	\multicolumn{2}{|@{}c@{}|}{
+		{\begin{tabularx}{.5\textwidth}{XXX}
+		{{ checkbox(telefon.technik.voip) }} VoIP &
+		{{ checkbox(telefon.technik.isdn) }} ISDN &
+		{{ checkbox(telefon.technik.pots) }} POTS \\
+		\end{tabularx}}
+	} & {{ telefon.technik.voip.user|default('-') }} &
+		{{ telefon.technik.voip.password|default('-') }} \\
+	\cline{1-4}
+
+	{\tiny Sprachkan"ale} & {\tiny SIP Server} & {\tiny SIP Proxy} &
+		{\tiny STUN Server} \\
+	{{ telefon.merkmale.sprachkanaele}} & {{ telefon.technik.voip.sip }} &
+		{{ telefon.technik.voip.proxy }} & {{ telefon.technik.voip.stun }} \\
+
+	\cline{1-4}
+
+	\multicolumn{4}{|@{}c@{}|}{
+		{\begin{tabularx}{\textwidth}{XXXXX}
+			{\tiny Flatrates} & & & \\
+
+			{{ checkbox(telefon.merkmale.flatrate.festnetz) }} Festnetz &
+			{{ checkbox(telefon.merkmale.flatrate.tmobile) }} T-Mobile &
+			{{ checkbox(telefon.merkmale.flatrate.vodafone) }} Vodafone &
+			{{ checkbox(telefon.merkmale.flatrate.o2) }} O2 &
+			{{ checkbox(telefon.merkmale.flatrate.eplus) }} E-Plus
+		\end{tabularx}}
+	} \\
+	\cline{1-4}
+\end{tabularx}
+
+{% endblock %}

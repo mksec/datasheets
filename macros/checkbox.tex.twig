@@ -1,0 +1,16 @@
+{# Diese Datei ist Teil der Datenblattsammlung von mksec.
+ #
+ # Diese Datei darf unter gleichen Bedingungen und Nennung des Autors weiter-
+ # gegeben und veraendert werden. Weitere Informationen finden Sie in der
+ # LICENSE Datei.
+ #
+ # Copyright (c) 2016 mksec, Inh. Alexander Haase
+ #}
+
+{% macro checkbox(var, value) %}
+	{% if value is empty %}
+		{% if var %}$\boxtimes${% else %}$\square${% endif %}
+	{% else %}
+		{% if var == value %}$\boxtimes${% else %}$\square${% endif %}
+	{% endif %}
+{% endmacro %}

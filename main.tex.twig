@@ -1,0 +1,152 @@
+% Diese Datei ist Teil der Datenblattsammlung von mksec.
+%
+% Diese Datei darf unter gleichen Bedingungen und Nennung des Autors weiter-
+% gegeben und veraendert werden. Weitere Informationen finden Sie in der LICENSE
+% Datei.
+%
+% Copyright (c) 2016 mksec, Inh. Alexander Haase
+
+\documentclass[11pt, a4paper]{scrartcl}
+
+
+\usepackage{amssymb}
+\usepackage[ngerman]{babel}
+\usepackage{eso-pic}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{rotating}
+\usepackage{scrlayer-scrpage}
+\usepackage{tabularx}
+\usepackage[absolute]{textpos}
+{% block packages %}{% endblock %}
+
+
+% Generelle Einstellungen zum Seiten-layout.
+%
+% * Es wird A4 Papier verwendet, da dieses den Platzanforderungen am ehesten
+%   gerecht wird. Zudem ist es auch am einfachsten zu drucken.
+% * Die Seitenabstaende wurden auf ein Minimum reduziert, um den meisten Platz
+%   ausnutzen zu koennen und trotzdem nicht in Konflikt mit Druck- und Loch-
+%   abstaenden zu kommen.
+% * Die erste Zeile eines neuen Absatzes wird nicht eingerueckt.
+\geometry{a4paper, tmargin=15mm, headsep=3mm, bmargin=20mm,
+                   lmargin=20mm, rmargin=10mm}
+\setlength{\parindent}{0pt}
+
+
+
+% Kopf- und Fusszeile.
+%
+% * In die Kopfzeile wird auf jede Seite ein Hinweis gedruckt, dass es sich um
+%   vertrauliche Daten handelt. Generell sollten die gedruckten Datenblaetter
+%   ebenso wie die zugrunde liegenden digitalen Daten unter verschluss gehalten
+%   werden, da einige Datenblaetter mitunter vertrauliche Daten, wie z.B.
+%   Passwoerter oder Vertrags-Daten, enthalten koennen.
+% * In der Fusszeile werden ein Hinweis und ein Logo gedurckt, dass die Daten-
+%   blaetter unter einer CC BY-SA Lizenz stehen. Es gilt jedoch zu beachten,
+%   dass der Inhalt des Datenblattes *nicht* verfielfältigt werden darf.
+
+% Entferne bestehende Inhalte der Kopf- und Fusszeilen.
+\clearpairofpagestyles
+
+% Passe die Hoehen der Kopf- und Fusszeilen an, um nicht in einen Konflikt mit
+% den unten definierten Inhalten zu kommen.
+\setlength{\headheight}{21pt}
+\setlength{\footheight}{27.2pt}
+
+% Verwende fuer Kopf- und Fusszeilen die normalen Schriftarten statt Kursiv-
+% schrift.
+%
+% Diese Loesung stammt von http://tex.stackexchange.com/q/280897
+\addtokomafont{pagehead}{\upshape}
+\addtokomafont{pagefoot}{\upshape}
+
+% Header rechts.
+\rohead{
+	\tiny
+	\begin{tabular}{p{.245\hsize}@{}}
+		\underline{\textbf{VERTRAULICH:}} Bewahren Sie dieses Dokument an einem
+		sicheren Ort auf, da es Zugangsdaten enthält.
+	\end{tabular}
+}
+
+% Footer links.
+\AddToShipoutPicture{
+	\AtPageLowerLeft{
+		\put(\LenToUnit{5mm}, \LenToUnit{5mm}){
+			\begin{sideways}
+				\tiny
+				\begin{tabularx}{99mm}{@{}l@{}l@{}}
+					{\begin{tabularx}{28mm}{@{}X@{}}
+					\href{http://creativecommons.org/licenses/by-sa/4.0/}
+						{\includegraphics[height=9.5mm]{cc-by-sa.png}}
+					\end{tabularx}} &
+					{\begin{tabularx}{71mm}{X@{}}
+						{% block title %}{% endblock %} Version 2.0.1.
+						Lizenziert unter
+						\href{http://creativecommons.org/licenses/by-sa/4.0/}{CC
+						BY-SA 4.0}. Weitergabe und Modifikation unter gleichen
+						Bedingungen bei Namensnennung gestattet. Lizenz gilt
+						nicht für Formularinhalte. \\
+						\copyright 2016 mksec, Inh. Alexander Haase
+					\end{tabularx}}
+				\end{tabularx}
+			\end{sideways}
+		}
+	}
+}
+
+
+% Zeichne eine Lochmarke. Auf Falzmarken wird hier bewusst verzichtet, da Daten-
+% Blaetter i.d.R. nicht gefaltet, sondern nur abgeheftet werden.
+\AddToShipoutPicture{
+	\AtPageLowerLeft{
+		\put(\LenToUnit{0mm},\LenToUnit{148.5mm}){\line(1,0){\LenToUnit{7.5mm}}}
+	}
+}
+
+
+\begin{document}
+
+
+{% from "macros/checkbox.tex.twig" import checkbox as checkbox %}
+
+
+% Als erstes Element bekommt *jedes* Datenblatt eine Box, welche den Namen, eine
+% kurze Beschreibung und den aktuellen Status des entsprechenden Objektes
+% enthaelt. Der Status ist nuetzlich, um z.B. auch vorliegende aber derzeit
+% ungenutzte Resourcen (z.B. unbenutzte LAN-Dosen, TAL, etc.), oder noch in der
+% Planung befindliche Objekte (z.B. eine Workstation - das Datenblatt kann dann
+% zur Fertigung genutzt werden) zu dokumentieren.
+\begin{tabular}{|p{.725\hsize}|p{.225\hsize}|}
+	\hline
+	\begin{tabular}[t]{@{}p{\hsize}@{}}
+		{\tiny } \\
+		{\Huge \bfseries {{ name }} } \\
+		{\scriptsize {{ description }} }
+	\end{tabular} &
+	\begin{tabular}[t]{p{\hsize}}
+		{\tiny Status} \\
+		{{ checkbox(status, 'used') }} in Benutzung \\
+		{{ checkbox(status, 'unused') }} unbenutzt \\
+		{{ checkbox(status, 'planned') }} in Planung
+	\end{tabular} \\
+	\hline
+\end{tabular}
+
+\vspace{1cm}
+
+
+{% block content %}{% endblock %}
+
+
+\vspace{1cm}
+
+
+\underline{Bemerkungen:} \\
+{% for line in bemerkungen %}
+	{{ line }} \\
+{% endfor %}
+
+\end{document}
